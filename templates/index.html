@@ -119,10 +119,6 @@
             background: var(--aquamarine);
             transform: translateY(-2px);
         }
-        
-        .sign-in-btn:active {
-            transform: translateY(2px);
-        }
 
         .create-account-btn {
             background: transparent;
@@ -147,8 +143,8 @@
         <h1 class="login-title">Sign In</h1>
         <input type="email" class="text-input" placeholder="Email">
         <input type="password" class="text-input" placeholder="Password">
-        <button class="button sign-in-btn" onclick="window.location.href='/logged-in'">Sign In</button>
-        <button class="button create-account-btn">Create Account</button>
+        <button class="button sign-in-btn" onclick="window.location.href='/login'">Sign In</button>
+        <button class="button create-account-btn" onclick="window.location.href='/login'">Create Account</button>
     </div>
 </body>
 </html>

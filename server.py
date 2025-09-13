@@ -4,7 +4,7 @@ from urllib.parse import quote_plus, urlencode
 
 from authlib.integrations.flask_client import OAuth
 from dotenv import find_dotenv, load_dotenv
-from flask import Flask, redirect, render_template, session, url_for, request
+from flask import Flask, redirect, render_template, session, url_for
 
 ENV_FILE = find_dotenv()
 if ENV_FILE:
@@ -25,10 +25,6 @@ oauth.register(
     server_metadata_url=f'https://{env.get("AUTH0_DOMAIN")}/.well-known/openid-configuration'
 )
 
-@app.route('/')
-def index():
-    return render_template('index.html')
-
 @app.route("/login")
 def login():
     return oauth.auth0.authorize_redirect(
@@ -39,7 +35,7 @@ def login():
 def callback():
     token = oauth.auth0.authorize_access_token()
     session["user"] = token
-    return redirect("/logged-in")
+    return redirect("/")
 
 @app.route("/logout")
 def logout():
@@ -49,31 +45,18 @@ def logout():
         + "/v2/logout?"
         + urlencode(
             {
-                "returnTo": url_for("index", _external=True),
+                "returnTo": url_for("home", _external=True),
                 "client_id": env.get("AUTH0_CLIENT_ID"),
             },
             quote_via=quote_plus,
         )
     )
 
-@app.route('/logged-in')
-def logged_in():
-    user = session.get('user')
-    if not user:
-        return redirect('/login')
-    return render_template('logged-in.html', user=user)
+@app.route("/")
+def home():
+    return render_template("home.html", session=session.get('user'), pretty=json.dumps(session.get('user'), indent=4))
 
-@app.route('/study')
-def study():
-    return render_template('study.html')
 
-@app.route('/manage-decks')
-def manage_decks():
-    return render_template('manage-decks.html')
 
-@app.route('/explore-decks')
-def explore_decks():
-    return render_template('explore-decks.html')
-
-if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=3000, debug=True)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=env.get("PORT", 3000))
