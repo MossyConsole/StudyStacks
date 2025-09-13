@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StudyStacks - Dashboard</title>
+    <title>StudyStacks - Explore Decks</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <style>
         body {
@@ -63,7 +63,7 @@
             position: relative;
         }
 
-        .login-container {
+        .content-container {
             position: absolute;
             top: 50%;
             left: 50%;
@@ -80,54 +80,13 @@
             gap: 20px;
         }
 
-        .login-title {
+        .page-title {
             font-family: var(--font-rubik);
             font-size: 28px;
             font-weight: 600;
             color: var(--white);
             text-shadow: 0 2px 4px var(--transparent-black-30);
             margin-bottom: 10px;
-        }
-
-        .dashboard-icons {
-            display: flex;
-            justify-content: space-between;
-            gap: 25px;
-            width: 100%;
-            max-width: 500px;
-        }
-
-        .dashboard-icon {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 30px 25px;
-            background: var(--transparent-white-15);
-            border-radius: 16px;
-            border: 1px solid var(--transparent-white-20);
-            backdrop-filter: blur(5px);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            flex: 1;
-            min-height: 120px;
-        }
-
-        .dashboard-icon:hover {
-            background: var(--transparent-white-20);
-            transform: translateY(-2px);
-        }
-
-        .dashboard-icon-emoji {
-            font-size: 48px;
-            margin-bottom: 12px;
-        }
-
-        .dashboard-icon-text {
-            font-family: var(--font-poppins);
-            font-size: 16px;
-            font-weight: 500;
-            color: var(--white);
-            text-align: center;
         }
     </style>
 </head>
@@ -140,22 +99,8 @@
         <div class="welcome-text">Welcome, (user)</div>
     </div>
     
-    <div class="login-container">
-        <h1 class="login-title">Dashboard</h1>
-        <div class="dashboard-icons">
-            <div class="dashboard-icon" onclick="window.location.href='/study'">
-                <div class="dashboard-icon-emoji">🧠</div>
-                <div class="dashboard-icon-text">Study</div>
-            </div>
-            <div class="dashboard-icon" onclick="window.location.href='/manage-decks'">
-                <div class="dashboard-icon-emoji">📝</div>
-                <div class="dashboard-icon-text">Manage Decks</div>
-            </div>
-            <div class="dashboard-icon" onclick="window.location.href='/explore-decks'">
-                <div class="dashboard-icon-emoji">🔍</div>
-                <div class="dashboard-icon-text">Explore Decks</div>
-            </div>
-        </div>
+    <div class="content-container">
+        <h1 class="page-title">Explore Decks</h1>
     </div>
 </body>
 </html>
