@@ -77,6 +77,21 @@ def study():
     decks = user_decks.get(user_id, [])
     return render_template('study.html', user=user, decks=decks)
 
+@app.route('/study/select', methods=['POST'])
+def study_select():
+    user = session.get('user')
+    if not user:
+        return redirect('/login')
+
+    idx = request.form.get('selected_deck_index')
+    if idx is None:
+        return redirect('/study')
+    try:
+        deck_index = int(idx)
+    except (TypeError, ValueError):
+        return redirect('/study')
+    return redirect(f'/study/{deck_index}')
+
 @app.route('/study/<int:deck_index>')
 def study_deck(deck_index):
     user = session.get('user')

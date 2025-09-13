@@ -203,12 +203,12 @@
 <body>
     <div class="top-bar">
         <div class="top-bar-left">
-            <div class="book-emoji">📚</div>
-            <div class="logo">StudyStacks</div>
+            <div class="book-emoji" onclick="window.location.href='/logged-in'" style="cursor: pointer;">📚</div>
+            <div class="logo" onclick="window.location.href='/logged-in'" style="cursor: pointer;">StudyStacks</div>
         </div>
-        <div class="welcome-text">Welcome, {{ user.userinfo.name if user and user.userinfo else 'User' }}!</div>
-        <div class="welcome-text">
-            <button onclick="window.location.href='/logout'" style="background: var(--transparent-white-15); color: var(--white); border: 1px solid var(--transparent-white-20); padding: 6px 12px; border-radius: 6px; font-family: var(--font-poppins); font-size: 12px; cursor: pointer; margin-left: 15px; z-index: 1001; position: relative; transition: all 0.3s ease;" onmouseover="this.style.background='var(--transparent-white-20)'" onmouseout="this.style.background='var(--transparent-white-15)'">Logout</button>
+        <div class="welcome-text" style="display:flex; align-items:center; gap:12px;">
+            <span style="opacity:0.9;">{{ user.userinfo.email if user and user.userinfo else '' }}</span>
+            <button onclick="window.location.href='/logout'" style="background: var(--transparent-white-15); color: var(--white); border: 1px solid var(--transparent-white-20); padding: 6px 12px; border-radius: 6px; font-family: var(--font-poppins); font-size: 12px; cursor: pointer; z-index: 1001; position: relative; transition: all 0.3s ease;" onmouseover="this.style.background='var(--transparent-white-20)'" onmouseout="this.style.background='var(--transparent-white-15)'">Logout</button>
         </div>
     </div>
     
