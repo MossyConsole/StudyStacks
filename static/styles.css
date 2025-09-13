@@ -1,0 +1,78 @@
+/* Font Imports */
+@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Computer+Modern&display=swap');
+
+/* CSS Custom Properties - Color Palette */
+:root {
+  /* CSS HEX */
+  --space-cadet: #302c5aff;
+  --marian-blue: #373b7aff;
+  --yinmn-blue: #36578fff;
+  --ucla-blue: #3c719bff;
+  --moonstone: #3fa6b2ff;
+  --robin-egg-blue: #3cc0beff;
+  --tiffany-blue: #5fdfddff;
+  --aquamarine: #6fe3baff;
+
+  /* CSS HSL */
+  --space-cadet-hsl: hsla(245, 34%, 26%, 1);
+  --marian-blue-hsl: hsla(236, 38%, 35%, 1);
+  --yinmn-blue-hsl: hsla(218, 45%, 39%, 1);
+  --ucla-blue-hsl: hsla(207, 44%, 42%, 1);
+  --moonstone-hsl: hsla(186, 48%, 47%, 1);
+  --robin-egg-blue-hsl: hsla(179, 52%, 49%, 1);
+  --tiffany-blue-hsl: hsla(179, 67%, 62%, 1);
+  --aquamarine-hsl: hsla(159, 67%, 66%, 1);
+
+  /* CSS RGB */
+  --space-cadet-rgb: rgba(48, 44, 90, 1);
+  --marian-blue-rgb: rgba(55, 59, 122, 1);
+  --yinmn-blue-rgb: rgba(54, 87, 143, 1);
+  --ucla-blue-rgb: rgba(60, 113, 155, 1);
+  --moonstone-rgb: rgba(63, 166, 178, 1);
+  --robin-egg-blue-rgb: rgba(60, 192, 190, 1);
+  --tiffany-blue-rgb: rgba(95, 223, 221, 1);
+  --aquamarine-rgb: rgba(111, 227, 186, 1);
+
+  /* CSS Gradients */
+  --gradient-top: linear-gradient(0deg, #302c5aff, #373b7aff, #36578fff, #3c719bff, #3fa6b2ff, #3cc0beff, #5fdfddff, #6fe3baff);
+  --gradient-right: linear-gradient(90deg, #302c5aff, #373b7aff, #36578fff, #3c719bff, #3fa6b2ff, #3cc0beff, #5fdfddff, #6fe3baff);
+  --gradient-bottom: linear-gradient(180deg, #302c5aff, #373b7aff, #36578fff, #3c719bff, #3fa6b2ff, #3cc0beff, #5fdfddff, #6fe3baff);
+  --gradient-left: linear-gradient(270deg, #302c5aff, #373b7aff, #36578fff, #3c719bff, #3fa6b2ff, #3cc0beff, #5fdfddff, #6fe3baff);
+  --gradient-top-right: linear-gradient(45deg, #302c5aff, #373b7aff, #36578fff, #3c719bff, #3fa6b2ff, #3cc0beff, #5fdfddff, #6fe3baff);
+  --gradient-bottom-right: linear-gradient(135deg, #302c5aff, #373b7aff, #36578fff, #3c719bff, #3fa6b2ff, #3cc0beff, #5fdfddff, #6fe3baff);
+  --gradient-top-left: linear-gradient(225deg, #302c5aff, #373b7aff, #36578fff, #3c719bff, #3fa6b2ff, #3cc0beff, #5fdfddff, #6fe3baff);
+  --gradient-bottom-left: linear-gradient(315deg, #302c5aff, #373b7aff, #36578fff, #3c719bff, #3fa6b2ff, #3cc0beff, #5fdfddff, #6fe3baff);
+  --gradient-radial: radial-gradient(#302c5aff, #373b7aff, #36578fff, #3c719bff, #3fa6b2ff, #3cc0beff, #5fdfddff, #6fe3baff);
+
+  /* Additional Colors */
+  --white: #ffffff;
+  --black: #000000;
+  --transparent-white-15: rgba(255, 255, 255, 0.15);
+  --transparent-white-20: rgba(255, 255, 255, 0.2);
+  --transparent-black-30: rgba(0, 0, 0, 0.3);
+
+  /* Font Families */
+  --font-rubik: 'Rubik', sans-serif;
+  --font-poppins: 'Poppins', sans-serif;
+  --font-computer-modern: 'Computer Modern', serif;
+}
+
+/* Base font setup */
+body {
+  font-family: var(--font-poppins);
+}
+
+/* Font utility classes */
+.font-rubik {
+  font-family: var(--font-rubik);
+}
+
+.font-poppins {
+  font-family: var(--font-poppins);
+}
+
+.font-computer-modern {
+  font-family: var(--font-computer-modern);
+}

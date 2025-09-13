@@ -1,10 +1,9 @@
-<!-- Login page HTML using styles.css -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Page</title>
+    <title>StudyStacks - Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <style>
         body {
@@ -23,10 +22,15 @@
             backdrop-filter: blur(10px);
             padding: 10.5px 21px;
             display: flex;
-            justify-content: flex-start;
+            justify-content: space-between;
+            align-items: center;
+            z-index: -1;
+        }
+
+        .top-bar-left {
+            display: flex;
             align-items: center;
             gap: 10.5px;
-            z-index: -1;
         }
 
         .logo {
@@ -50,12 +54,21 @@
             border: 1px solid var(--transparent-white-20);
         }
 
+        .welcome-text {
+            font-family: var(--font-poppins);
+            font-size: 14px;
+            color: var(--white);
+            text-shadow: 0 2px 4px var(--transparent-black-30);
+            z-index: 1000;
+            position: relative;
+        }
+
         .login-container {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: var(--transparent-white-15);
+            background: var(--marian-blue);
             backdrop-filter: blur(10px);
             border-radius: 16px;
             padding: 40px;
@@ -76,79 +89,73 @@
             margin-bottom: 10px;
         }
 
-        .text-input {
-            width: 280px;
-            padding: 12px 16px;
-            border: 1px solid var(--transparent-white-20);
-            border-radius: 8px;
+        .dashboard-icons {
+            display: flex;
+            justify-content: space-between;
+            gap: 25px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .dashboard-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 25px;
             background: var(--transparent-white-15);
-            color: var(--white);
-            font-family: var(--font-poppins);
-            font-size: 14px;
+            border-radius: 16px;
+            border: 1px solid var(--transparent-white-20);
             backdrop-filter: blur(5px);
-        }
-
-        .text-input::placeholder {
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .text-input:focus {
-            outline: none;
-            border-color: var(--tiffany-blue);
-            box-shadow: 0 0 0 2px rgba(95, 223, 221, 0.3);
-        }
-
-        .button {
-            width: 280px;
-            padding: 12px 16px;
-            border: none;
-            border-radius: 8px;
-            font-family: var(--font-poppins);
-            font-size: 14px;
-            font-weight: 500;
             cursor: pointer;
             transition: all 0.3s ease;
+            flex: 1;
+            min-height: 120px;
         }
 
-        .sign-in-btn {
-            background: var(--tiffany-blue);
-            color: var(--space-cadet);
-        }
-
-        .sign-in-btn:hover {
-            background: var(--aquamarine);
+        .dashboard-icon:hover {
+            background: var(--transparent-white-20);
             transform: translateY(-2px);
         }
-        
-        .sign-in-btn:active {
-            transform: translateY(2px);
+
+        .dashboard-icon-emoji {
+            font-size: 48px;
+            margin-bottom: 12px;
         }
 
-        .create-account-btn {
-            background: transparent;
+        .dashboard-icon-text {
+            font-family: var(--font-poppins);
+            font-size: 16px;
+            font-weight: 500;
             color: var(--white);
-            border: 1px solid var(--transparent-white-20);
-        }
-
-        .create-account-btn:hover {
-            background: var(--transparent-white-15);
-            border-color: var(--tiffany-blue);
+            text-align: center;
         }
     </style>
-    
 </head>
 <body>
     <div class="top-bar">
-        <div class="book-emoji">📚</div>
-        <div class="logo">StudyStacks</div>
+        <div class="top-bar-left">
+            <div class="book-emoji">📚</div>
+            <div class="logo">StudyStacks</div>
+        </div>
+        <div class="welcome-text">Welcome, (user)</div>
     </div>
     
     <div class="login-container">
-        <h1 class="login-title">Sign In</h1>
-        <input type="email" class="text-input" placeholder="Email">
-        <input type="password" class="text-input" placeholder="Password">
-        <button class="button sign-in-btn" onclick="window.location.href='/logged-in'">Sign In</button>
-        <button class="button create-account-btn">Create Account</button>
+        <h1 class="login-title">Dashboard</h1>
+        <div class="dashboard-icons">
+            <div class="dashboard-icon">
+                <div class="dashboard-icon-emoji">🧠</div>
+                <div class="dashboard-icon-text">Study</div>
+            </div>
+            <div class="dashboard-icon">
+                <div class="dashboard-icon-emoji">📝</div>
+                <div class="dashboard-icon-text">Manage Decks</div>
+            </div>
+            <div class="dashboard-icon">
+                <div class="dashboard-icon-emoji">🔍</div>
+                <div class="dashboard-icon-text">Explore Decks</div>
+            </div>
+        </div>
     </div>
 </body>
 </html>
