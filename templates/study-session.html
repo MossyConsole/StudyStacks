@@ -112,21 +112,22 @@
             font-family: var(--font-rubik);
             font-size: 24px;
             font-weight: 600;
-            color: var(--white);
+            color: var(--space-cadet);
             margin-bottom: 30px;
+            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3);
         }
 
         .card-question {
             font-family: var(--font-rubik);
-            font-size: 24px;
-            font-weight: 600;
-            color: var(--white);
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--space-cadet);
             margin-bottom: 30px;
             min-height: 80px;
             display: flex;
             align-items: center;
             justify-content: center;
-            text-shadow: 0 2px 4px var(--transparent-black-30);
+            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.4);
         }
 
         .card-answer {
@@ -181,14 +182,14 @@
         }
 
         .choice-btn {
-            background: var(--transparent-white-15);
-            color: var(--white);
-            border: 2px solid var(--transparent-white-20);
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--space-cadet);
+            border: 2px solid rgba(255, 255, 255, 0.7);
             border-radius: 12px;
             padding: 15px 20px;
             font-family: var(--font-poppins);
-            font-size: 14px;
-            font-weight: 500;
+            font-size: 15px;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
             min-height: 60px;
@@ -196,12 +197,14 @@
             align-items: center;
             justify-content: center;
             text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         .choice-btn:hover {
-            background: var(--transparent-white-25);
-            border-color: var(--tiffany-blue);
+            background: rgba(255, 255, 255, 1);
+            border-color: var(--space-cadet);
             transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
 
         .choice-btn.correct {
@@ -287,12 +290,34 @@
         .progress-info {
             font-family: var(--font-poppins);
             font-size: 14px;
-            color: rgba(255, 255, 255, 0.7);
+            color: var(--space-cadet);
             margin-bottom: 20px;
+            font-weight: 500;
+            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3);
         }
 
         .hidden {
             display: none;
+        }
+
+        .next-card-btn {
+            background: linear-gradient(135deg, #8b5cf6, #a855f7);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 14px 28px;
+            font-family: var(--font-poppins);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+        }
+
+        .next-card-btn:hover {
+            background: linear-gradient(135deg, #7c3aed, #9333ea);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(139, 92, 246, 0.4);
         }
     </style>
 </head>
@@ -328,7 +353,9 @@
                 </div>
                 
                 <!-- Next Card Button -->
-                <button class="show-answer-btn hidden" id="next-card-btn" onclick="nextCard()">Next Card</button>
+                <div style="margin-top: 60px;">
+                    <button class="next-card-btn hidden" id="next-card-btn" onclick="nextCard()">Next Card</button>
+                </div>
                 
                 <!-- Session Complete -->
                 <div class="hidden" id="session-complete">
