@@ -59,10 +59,115 @@
 
         .content-container {
             margin-top: 80px;
-            padding: 40px;
-            max-width: 800px;
+            padding: 20px;
+            max-width: 1200px;
             margin-left: auto;
             margin-right: auto;
+        }
+
+        .game-layout {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        .monster-panel {
+            background: var(--transparent-white-10);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--transparent-white-20);
+            backdrop-filter: blur(10px);
+            z-index: 10;
+            position: relative;
+        }
+
+        .player-panel {
+            background: var(--transparent-white-10);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--transparent-white-20);
+            backdrop-filter: blur(10px);
+            z-index: 10;
+            position: relative;
+        }
+
+        .health-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .health-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+            border-radius: 8px;
+        }
+
+        .player-health {
+            background: linear-gradient(90deg, #22c55e, #16a34a);
+        }
+
+        .monster-health {
+            background: linear-gradient(90deg, #ef4444, #dc2626);
+        }
+
+        .health-text {
+            font-family: var(--font-poppins);
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--white);
+            text-align: center;
+            margin: 5px 0;
+        }
+
+        .streak-bar {
+            width: 100%;
+            height: 16px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 10px 0;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .streak-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #8b5cf6, #a855f7);
+            transition: width 0.5s ease;
+            border-radius: 6px;
+        }
+
+        .panel-title {
+            font-family: var(--font-rubik);
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--white);
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0;
+            font-family: var(--font-poppins);
+            font-size: 14px;
+            color: var(--white);
+        }
+
+        .monster-image {
+            width: 120px;
+            height: 120px;
+            border-radius: 12px;
+            margin: 0 auto 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            object-fit: cover;
         }
 
         .back-btn {
@@ -85,7 +190,6 @@
         .study-card {
             position: relative;
             text-align: center;
-            margin-bottom: 30px;
             min-height: 600px;
             display: flex;
             flex-direction: column;
@@ -97,8 +201,8 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 840px;
-            height: 560px;
+            width: 630px;
+            height: 432px;
             z-index: 1;
         }
 
@@ -319,6 +423,123 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 16px rgba(139, 92, 246, 0.4);
         }
+
+        .action-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-family: var(--font-poppins);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .attack-btn {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        .attack-btn:hover {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+        }
+
+        .spell-btn {
+            background: linear-gradient(135deg, #8b5cf6, #a855f7);
+            color: white;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+        }
+
+        .spell-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, #7c3aed, #9333ea);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(139, 92, 246, 0.4);
+        }
+
+        .spell-btn:disabled {
+            background: rgba(139, 92, 246, 0.3);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .damage-indicator {
+            position: absolute;
+            font-family: var(--font-rubik);
+            font-size: 24px;
+            font-weight: 700;
+            pointer-events: none;
+            z-index: 1000;
+            animation: damageFloat 1.5s ease-out forwards;
+        }
+
+        .damage-player {
+            color: #ef4444;
+            text-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
+        }
+
+        .damage-monster {
+            color: #22c55e;
+            text-shadow: 0 0 10px rgba(34, 197, 94, 0.8);
+        }
+
+        .heal-indicator {
+            color: #10b981;
+            text-shadow: 0 0 10px rgba(16, 185, 129, 0.8);
+        }
+
+        @keyframes damageFloat {
+            0% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+        }
+
+        .game-over {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .game-over-content {
+            background: var(--transparent-white-15);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            border: 2px solid var(--transparent-white-30);
+            max-width: 400px;
+        }
+
+        .game-over-title {
+            font-family: var(--font-rubik);
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 20px;
+        }
+
+        .game-over-text {
+            font-family: var(--font-poppins);
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 30px;
+        }
     </style>
 </head>
 <body>
@@ -334,14 +555,30 @@
     </div>
     
     <div class="content-container">
-        <div class="study-card">
-            <img src="{{ url_for('static', filename='assets/flashcard.svg') }}" class="flashcard-svg" alt="Flashcard background">
-            
-            <div class="card-content">
-                <div class="deck-title">{{ deck.name }}</div>
-                <div class="progress-info">Card <span id="current-card">1</span> of {{ deck.flashcards|length }}</div>
+        <div class="game-layout">
+            <!-- Monster Panel -->
+            <div class="monster-panel">
+                <div class="panel-title">🐉 Monster</div>
+                <img src="{{ url_for('static', filename='assets/minotaur4x.png') }}" class="monster-image" alt="Minotaur Monster">
+                <div class="health-text">HP: <span id="monster-hp-text">0</span>/<span id="monster-max-hp">0</span></div>
+                <div class="health-bar">
+                    <div class="health-fill monster-health" id="monster-health-bar" style="width: 100%;"></div>
+                </div>
+                <div class="stat-item">
+                    <span>Attack Power:</span>
+                    <span id="monster-attack">5-10</span>
+                </div>
+            </div>
+
+            <!-- Study Card -->
+            <div class="study-card">
+                <img src="{{ url_for('static', filename='assets/flashcard.svg') }}" class="flashcard-svg" alt="Flashcard background">
                 
-                <div class="card-question" id="question"></div>
+                <div class="card-content">
+                    <div class="deck-title">{{ deck.name }}</div>
+                    <div class="progress-info">Card <span id="current-card">1</span> of {{ deck.flashcards|length }}</div>
+                    
+                    <div class="card-question" id="question"></div>
                 
                 <!-- Multiple Choice / True-False Buttons -->
                 <div class="choice-buttons hidden" id="choice-buttons"></div>
@@ -352,20 +589,63 @@
                     <button class="submit-answer-btn" onclick="submitTypedAnswer()">Submit Answer</button>
                 </div>
                 
+                <!-- Battle Actions -->
+                <div class="battle-actions hidden" id="battle-actions" style="margin-top: 40px;">
+                    <div style="margin-bottom: 20px; font-family: var(--font-poppins); font-size: 16px; color: var(--space-cadet); font-weight: 600;">Choose your action:</div>
+                    <div style="display: flex; gap: 20px; justify-content: center;">
+                        <button class="action-btn attack-btn" onclick="chooseAction('attack')">⚔️ Attack</button>
+                        <button class="action-btn spell-btn" id="spell-btn" onclick="chooseAction('spell')" disabled>✨ Spell</button>
+                    </div>
+                </div>
+
                 <!-- Next Card Button -->
-                <div style="margin-top: 60px;">
+                <div style="margin-top: 40px;">
                     <button class="next-card-btn hidden" id="next-card-btn" onclick="nextCard()">Next Card</button>
                 </div>
                 
-                <!-- Session Complete -->
-                <div class="hidden" id="session-complete">
-                    <h3 style="color: var(--white); margin-bottom: 20px;">Study Session Complete! &#127881;</h3>
-                    <button class="show-answer-btn" onclick="finishSession()">Finish Session</button>
+                    <!-- Session Complete -->
+                    <div class="hidden" id="session-complete">
+                        <h3 style="color: var(--white); margin-bottom: 20px;">Study Session Complete! &#127881;</h3>
+                        <button class="show-answer-btn" onclick="finishSession()">Finish Session</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Player Panel -->
+            <div class="player-panel">
+                <div class="panel-title">🛡️ Player</div>
+                <div class="health-text">HP: <span id="player-hp-text">0</span>/<span id="player-max-hp">0</span></div>
+                <div class="health-bar">
+                    <div class="health-fill player-health" id="player-health-bar" style="width: 100%;"></div>
+                </div>
+                <div class="stat-item">
+                    <span>Attack Streak:</span>
+                    <span id="attack-streak">0</span>
+                </div>
+                <div class="stat-item">
+                    <span>Spell Progress:</span>
+                    <span id="spell-progress">0/3</span>
+                </div>
+                <div class="streak-bar">
+                    <div class="streak-fill" id="spell-streak-bar" style="width: 0%;"></div>
+                </div>
+                <div class="stat-item" style="margin-top: 15px; font-size: 12px; opacity: 0.8;">
+                    <span>Next Spell:</span>
+                    <span id="spell-status">Locked</span>
                 </div>
             </div>
         </div>
         
         <a href="/study" class="back-btn" style="display: block; text-align: center; margin: 30px auto 0; width: 200px;">← Back to Study</a>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div class="game-over hidden" id="game-over">
+        <div class="game-over-content">
+            <div class="game-over-title" id="game-over-title">Victory!</div>
+            <div class="game-over-text" id="game-over-text">You have defeated the monster!</div>
+            <button class="show-answer-btn" onclick="finishSession()">Continue</button>
+        </div>
     </div>
 
     <script>
@@ -374,10 +654,42 @@
         const deckIndex = {{ deck_index }};
         let sessionResults = [];
         
-        // Initialize first card
+        // Game state variables
+        let playerHP = 0;
+        let playerMaxHP = 0;
+        let monsterHP = 0;
+        let monsterMaxHP = 0;
+        let attackStreak = 0;
+        let spellProgress = 0;
+        let gameOver = false;
+        let lastAnswerCorrect = false;
+        
+        // Initialize game
         document.addEventListener('DOMContentLoaded', function() {
+            initializeGame();
             loadCard(0);
         });
+        
+        function initializeGame() {
+            // Calculate health values
+            const totalCards = studyData.length;
+            playerMaxHP = totalCards * 10;
+            monsterMaxHP = Math.ceil((playerMaxHP * 2/3) / 10) * 10;
+            
+            // Set initial HP
+            playerHP = playerMaxHP;
+            monsterHP = monsterMaxHP;
+            
+            // Reset game state
+            attackStreak = 0;
+            spellProgress = 0;
+            gameOver = false;
+            lastAnswerCorrect = false;
+            
+            // Update UI
+            updateHealthBars();
+            updatePlayerStats();
+        }
         
         function loadCard(index) {
             if (index >= studyData.length) {
@@ -393,6 +705,7 @@
             document.getElementById('choice-buttons').classList.add('hidden');
             document.getElementById('typed-answer-container').classList.add('hidden');
             document.getElementById('next-card-btn').classList.add('hidden');
+            document.getElementById('battle-actions').classList.add('hidden');
             
             // Show appropriate answer interface
             if (cardData.answer_mode === 'typed') {
@@ -429,15 +742,26 @@
                 }
             });
             
-            // Record result
+            // Record result and handle battle
             sessionResults.push({
                 cardIndex: currentCardIndex,
                 correct: isCorrect
             });
             
-            // Show next card button after delay
+            lastAnswerCorrect = isCorrect;
+            
+            // Show battle actions or next card based on answer
             setTimeout(() => {
-                document.getElementById('next-card-btn').classList.remove('hidden');
+                if (isCorrect && !gameOver) {
+                    // Increment spell progress for correct answers
+                    if (spellProgress < 3) {
+                        spellProgress++;
+                    }
+                    updatePlayerStats();
+                    showBattleActions();
+                } else {
+                    handleIncorrectAnswer();
+                }
             }, 1000);
         }
         
@@ -457,21 +781,220 @@
                 input.value = `Your answer: ${userAnswer} | Correct: ${correctAnswer}`;
             }
             
-            // Record result
+            // Record result and handle battle
             sessionResults.push({
                 cardIndex: currentCardIndex,
                 correct: isCorrect
             });
             
-            // Show next card button after delay
+            lastAnswerCorrect = isCorrect;
+            
+            // Show battle actions or next card based on answer
             setTimeout(() => {
-                document.getElementById('next-card-btn').classList.remove('hidden');
+                if (isCorrect && !gameOver) {
+                    // Increment spell progress for correct answers
+                    if (spellProgress < 3) {
+                        spellProgress++;
+                    }
+                    updatePlayerStats();
+                    showBattleActions();
+                } else {
+                    handleIncorrectAnswer();
+                }
             }, 1500);
         }
         
         function nextCard() {
             currentCardIndex++;
             loadCard(currentCardIndex);
+        }
+        
+        function showBattleActions() {
+            document.getElementById('battle-actions').classList.remove('hidden');
+            
+            // Enable/disable spell button based on spell progress
+            const spellBtn = document.getElementById('spell-btn');
+            spellBtn.disabled = spellProgress < 3;
+        }
+        
+        function chooseAction(action) {
+            document.getElementById('battle-actions').classList.add('hidden');
+            
+            if (action === 'attack') {
+                handleAttack();
+            } else if (action === 'spell') {
+                handleSpell();
+            }
+        }
+        
+        function handleAttack() {
+            if (lastAnswerCorrect) {
+                // Player deals 10 damage to monster
+                monsterHP = Math.max(0, monsterHP - 10);
+                showDamageIndicator('monster', 10);
+                attackStreak++;
+                
+                // Monster counterattacks for 5 damage
+                setTimeout(() => {
+                    if (monsterHP > 0) {
+                        playerHP = Math.max(0, playerHP - 5);
+                        showDamageIndicator('player', 5);
+                    }
+                    
+                    updateHealthBars();
+                    updatePlayerStats();
+                    checkGameOver();
+                    
+                    if (!gameOver) {
+                        setTimeout(() => {
+                            document.getElementById('next-card-btn').classList.remove('hidden');
+                        }, 1000);
+                    }
+                }, 1000);
+            }
+        }
+        
+        function handleSpell() {
+            if (spellProgress >= 3) {
+                // SuperStreak: 25 damage, no monster counter, heal 20 HP
+                monsterHP = Math.max(0, monsterHP - 25);
+                playerHP = Math.min(playerMaxHP, playerHP + 20);
+                
+                showDamageIndicator('monster', 25);
+                setTimeout(() => {
+                    showHealIndicator('player', 20);
+                }, 500);
+                
+                // Reset spell progress
+                spellProgress = 0;
+                attackStreak++;
+                
+                updateHealthBars();
+                updatePlayerStats();
+                checkGameOver();
+                
+                if (!gameOver) {
+                    setTimeout(() => {
+                        document.getElementById('next-card-btn').classList.remove('hidden');
+                    }, 1500);
+                }
+            }
+        }
+        
+        function handleIncorrectAnswer() {
+            // Player deals 0 damage, monster deals 10 damage, reset attack streak
+            playerHP = Math.max(0, playerHP - 10);
+            attackStreak = 0;
+            spellProgress = 0;
+            
+            showDamageIndicator('player', 10);
+            
+            updateHealthBars();
+            updatePlayerStats();
+            checkGameOver();
+            
+            if (!gameOver) {
+                setTimeout(() => {
+                    document.getElementById('next-card-btn').classList.remove('hidden');
+                }, 1000);
+            }
+        }
+        
+        function updateHealthBars() {
+            // Update player health bar
+            const playerPercent = (playerHP / playerMaxHP) * 100;
+            document.getElementById('player-health-bar').style.width = playerPercent + '%';
+            document.getElementById('player-hp-text').textContent = playerHP;
+            document.getElementById('player-max-hp').textContent = playerMaxHP;
+            
+            // Update monster health bar
+            const monsterPercent = (monsterHP / monsterMaxHP) * 100;
+            document.getElementById('monster-health-bar').style.width = monsterPercent + '%';
+            document.getElementById('monster-hp-text').textContent = monsterHP;
+            document.getElementById('monster-max-hp').textContent = monsterMaxHP;
+        }
+        
+        function updatePlayerStats() {
+            // Update attack streak
+            document.getElementById('attack-streak').textContent = attackStreak;
+            
+            // Update spell progress text
+            document.getElementById('spell-progress').textContent = spellProgress + '/3';
+            
+            // Update spell streak bar
+            const spellPercent = (spellProgress / 3) * 100;
+            document.getElementById('spell-streak-bar').style.width = spellPercent + '%';
+            
+            // Update spell status
+            const spellStatus = document.getElementById('spell-status');
+            if (spellProgress >= 3) {
+                spellStatus.textContent = 'Ready!';
+                spellStatus.style.color = '#10b981';
+            } else {
+                spellStatus.textContent = 'Locked';
+                spellStatus.style.color = 'rgba(255, 255, 255, 0.6)';
+            }
+        }
+        
+        function showDamageIndicator(target, damage) {
+            const indicator = document.createElement('div');
+            indicator.className = 'damage-indicator';
+            indicator.textContent = '-' + damage;
+            
+            if (target === 'player') {
+                indicator.classList.add('damage-player');
+                indicator.style.left = '75%';
+            } else {
+                indicator.classList.add('damage-monster');
+                indicator.style.left = '25%';
+            }
+            
+            indicator.style.top = '50%';
+            document.body.appendChild(indicator);
+            
+            setTimeout(() => {
+                document.body.removeChild(indicator);
+            }, 1500);
+        }
+        
+        function showHealIndicator(target, heal) {
+            const indicator = document.createElement('div');
+            indicator.className = 'damage-indicator heal-indicator';
+            indicator.textContent = '+' + heal;
+            indicator.style.left = '75%';
+            indicator.style.top = '50%';
+            
+            document.body.appendChild(indicator);
+            
+            setTimeout(() => {
+                document.body.removeChild(indicator);
+            }, 1500);
+        }
+        
+        function checkGameOver() {
+            if (playerHP <= 0) {
+                gameOver = true;
+                showGameOver(false);
+            } else if (monsterHP <= 0 && monsterMaxHP > 0) {
+                gameOver = true;
+                showGameOver(true);
+            }
+        }
+        
+        function showGameOver(victory) {
+            const gameOverModal = document.getElementById('game-over');
+            const title = document.getElementById('game-over-title');
+            const text = document.getElementById('game-over-text');
+            
+            if (victory) {
+                title.textContent = 'Victory! 🎉';
+                text.textContent = 'You have defeated the monster and mastered the deck!';
+            } else {
+                title.textContent = 'Defeat 💀';
+                text.textContent = 'The monster has defeated you. Study harder and try again!';
+            }
+            
+            gameOverModal.classList.remove('hidden');
         }
         
         function showSessionComplete() {
