@@ -486,12 +486,12 @@ def study_deck(deck_index):
             },
             'exam_prep': {
                 'player_hp_multiplier': 20,  # Same as normal for now
-                'monster_hp_ratio': 2/3,     # Same as normal for now
-                'monster_hp_base': 40,       # Same as normal for now
+                'monster_hp_ratio': 4/5,     # Same as normal for now
+                'monster_hp_base': 30,       # Same as normal for now
                 'monster_attack_min': 10,     # Different monster attack
                 'monster_attack_max': 15,    # Different monster attack
                 'spell_charge_requirement': 3, # Requires 5 correct answers
-                'spell_damage': 50,          # Higher spell damage for exam prep
+                'spell_damage': 30,          # Higher spell damage for exam prep
                 'spell_healing': 50          # Higher spell healing for exam prep
             }
         }
