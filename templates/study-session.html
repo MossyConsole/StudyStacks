@@ -59,17 +59,18 @@
 
         .content-container {
             margin-top: 40px;
-            padding: 20px;
-            max-width: 1200px;
+            padding: 40px;
+            max-width: 1400px;
             margin-left: auto;
             margin-right: auto;
         }
 
         .game-layout {
-            display: grid;
-            grid-template-columns: 1fr 2fr 1fr;
-            gap: 30px;
+            display: flex;
+            justify-content: space-between;
             align-items: center;
+            gap: 30px;
+            width: 100%;
         }
 
         .monster-panel {
@@ -80,7 +81,8 @@
             backdrop-filter: blur(10px);
             z-index: 10;
             position: relative;
-            margin-left: -20px;
+            flex: 1;
+            min-width: 0;
         }
 
         .player-panel {
@@ -91,7 +93,13 @@
             backdrop-filter: blur(10px);
             z-index: 10;
             position: relative;
-            margin-right: -20px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .study-card-container {
+            flex: 2;
+            min-width: 0;
         }
 
         .health-bar {
@@ -167,9 +175,9 @@
             width: 120px;
             height: 120px;
             border-radius: 12px;
-            margin: 0 auto 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
+            margin: 20px auto;
             object-fit: cover;
+            display: block;
         }
 
         .back-btn {
@@ -192,26 +200,29 @@
         .study-card {
             position: relative;
             text-align: center;
-            min-height: 600px;
+            background: #5FDFDD;
+            border-radius: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            min-height: 400px;
             display: flex;
             flex-direction: column;
             justify-content: center;
         }
 
         .flashcard-svg {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 630px;
-            height: 432px;
-            z-index: 1;
+            display: none;
         }
 
         .card-content {
             position: relative;
             z-index: 2;
-            padding: 150px 50px;
+            padding: 40px 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            flex-grow: 1;
         }
 
         .deck-title {
@@ -560,7 +571,7 @@
         <div class="game-layout">
             <!-- Monster Panel -->
             <div class="monster-panel">
-                <div class="panel-title">🐉 Monster</div>
+                <div class="panel-title">Monster</div>
                 <img src="{{ url_for('static', filename='assets/minotaur4x.png') }}" class="monster-image" alt="Minotaur Monster">
                 <div class="health-text">HP: <span id="monster-hp-text">0</span>/<span id="monster-max-hp">0</span></div>
                 <div class="health-bar">
@@ -573,7 +584,8 @@
             </div>
 
             <!-- Study Card -->
-            <div class="study-card">
+            <div class="study-card-container">
+                <div class="study-card">
                 <img src="{{ url_for('static', filename='assets/flashcard.svg') }}" class="flashcard-svg" alt="Flashcard background">
                 
                 <div class="card-content">
@@ -612,10 +624,11 @@
                     </div>
                 </div>
             </div>
+            </div>
 
             <!-- Player Panel -->
             <div class="player-panel">
-                <div class="panel-title">🛡️ Player</div>
+                <div class="panel-title">You</div>
                 <div class="health-text">HP: <span id="player-hp-text">0</span>/<span id="player-max-hp">0</span></div>
                 <div class="health-bar">
                     <div class="health-fill player-health" id="player-health-bar" style="width: 100%;"></div>
@@ -675,8 +688,8 @@
         function initializeGame() {
             // Calculate health values (doubled)
             const totalCards = studyData.length;
-            playerMaxHP = totalCards * 20;  // Doubled from 10 to 20
-            monsterMaxHP = Math.ceil((playerMaxHP * 2/3) / 10) * 10;
+            playerMaxHP = totalCards * 20;
+            monsterMaxHP = Math.ceil((playerMaxHP * 2/3) / 10) * 50;
             
             // Set initial HP
             playerHP = playerMaxHP;
