@@ -1,6 +1,8 @@
 import json
 from os import environ as env
 from urllib.parse import quote_plus, urlencode
+import pymongo
+from bson.objectid import ObjectId
 
 from authlib.integrations.flask_client import OAuth
 from dotenv import find_dotenv, load_dotenv
@@ -15,8 +17,84 @@ if ENV_FILE:
 app = Flask(__name__)
 app.secret_key = env.get("APP_SECRET_KEY")
 
-# In-memory storage for decks (will be replaced with MongoDB)
+# MongoDB connection
+try:
+    mongo = pymongo.MongoClient(
+        host='localhost', 
+        port=27017,
+        serverSelectionTimeoutMS = 1000
+    )
+    db = mongo.studystack
+    mongo.server_info() # Triggers the exception if connection to the database is unsuccessful
+    print("Connected to MongoDB successfully")
+except Exception as ex:
+    print(f"ERROR - Cannot connect to MongoDB: {ex}")
+    db = None
+
+# In-memory storage for decks (fallback if MongoDB is not available)
 user_decks = {}
+
+# MongoDB helper functions
+def get_user_decks(user_id):
+    """Get all decks for a user from MongoDB or fallback to in-memory storage"""
+    if db is not None:
+        try:
+            decks_data = list(db.decks.find({"user_id": user_id}))
+            decks = []
+            for deck_data in decks_data:
+                # Convert MongoDB document to Deck object
+                flashcards = []
+                for card_data in deck_data.get('flashcards', []):
+                    flashcard = Flashcard(
+                        card_data['question'],
+                        card_data['answer'],
+                        card_data.get('correct_answers', 0),
+                        card_data.get('reversible', False)
+                    )
+                    flashcards.append(flashcard)
+                
+                deck = Deck(deck_data['name'], flashcards)
+                deck.experience = deck_data.get('experience', 0)
+                decks.append(deck)
+            return decks
+        except Exception as ex:
+            print(f"Error getting decks from MongoDB: {ex}")
+    
+    # Fallback to in-memory storage
+    return user_decks.get(user_id, [])
+
+def save_user_decks(user_id, decks):
+    """Save all decks for a user to MongoDB or fallback to in-memory storage"""
+    if db is not None:
+        try:
+            # Clear existing decks for this user
+            db.decks.delete_many({"user_id": user_id})
+            
+            # Save new decks
+            for deck in decks:
+                flashcards_data = []
+                for card in deck.flashcards:
+                    flashcards_data.append({
+                        'question': card.question,
+                        'answer': card.answer,
+                        'correct_answers': card.correct_answers,
+                        'reversible': card.reversible
+                    })
+                
+                deck_data = {
+                    'user_id': user_id,
+                    'name': deck.name,
+                    'experience': deck.experience,
+                    'flashcards': flashcards_data
+                }
+                db.decks.insert_one(deck_data)
+            return True
+        except Exception as ex:
+            print(f"Error saving decks to MongoDB: {ex}")
+    
+    # Fallback to in-memory storage
+    user_decks[user_id] = decks
+    return True
 
 def generate_ai_cards(deck, num_cards=5):
     print("Got here first tho")
@@ -152,7 +230,7 @@ def study():
         return redirect('/login')
     
     user_id = user['userinfo']['sub']
-    decks = user_decks.get(user_id, [])
+    decks = get_user_decks(user_id)
     return render_template('study.html', user=user, decks=decks)
 
 @app.route('/study/select', methods=['POST'])
@@ -177,7 +255,7 @@ def study_deck(deck_index):
         return redirect('/login')
     
     user_id = user['userinfo']['sub']
-    decks = user_decks.get(user_id, [])
+    decks = get_user_decks(user_id)
     
     if deck_index < len(decks):
         deck = decks[deck_index]
@@ -194,15 +272,17 @@ def submit_answer(deck_index):
         return redirect('/login')
     
     user_id = user['userinfo']['sub']
-    decks = user_decks.get(user_id, [])
+    decks = get_user_decks(user_id)
     
     if deck_index < len(decks):
         card_index = int(request.form.get('card_index', 0))
         correct = request.form.get('correct') == 'true'
         
+        # Update card's correct answers if answered correctly
         if correct and card_index < len(decks[deck_index].flashcards):
             decks[deck_index].flashcards[card_index].correct_answers += 1
             decks[deck_index].experience += 1
+            save_user_decks(user_id, decks)
     
     return redirect(f'/study/{deck_index}')
 
@@ -213,7 +293,7 @@ def manage_decks():
         return redirect('/login')
     
     user_id = user['userinfo']['sub']
-    decks = user_decks.get(user_id, [])
+    decks = get_user_decks(user_id)
     return render_template('manage-decks.html', user=user, decks=decks)
 
 @app.route('/create-deck', methods=['POST'])
@@ -226,10 +306,10 @@ def create_deck():
     deck_name = request.form.get('deck_name')
     
     if deck_name:
+        decks = get_user_decks(user_id)
         new_deck = Deck(deck_name, [])
-        if user_id not in user_decks:
-            user_decks[user_id] = []
-        user_decks[user_id].append(new_deck)
+        decks.append(new_deck)
+        save_user_decks(user_id, decks)
     
     return redirect('/manage-decks')
 
@@ -240,7 +320,7 @@ def view_deck(deck_index):
         return redirect('/login')
     
     user_id = user['userinfo']['sub']
-    decks = user_decks.get(user_id, [])
+    decks = get_user_decks(user_id)
     
     if deck_index < len(decks):
         deck = decks[deck_index]
@@ -255,7 +335,7 @@ def add_card(deck_index):
         return redirect('/login')
     
     user_id = user['userinfo']['sub']
-    decks = user_decks.get(user_id, [])
+    decks = get_user_decks(user_id)
     
     if deck_index < len(decks):
         question = request.form.get('question')
@@ -265,6 +345,7 @@ def add_card(deck_index):
         if question and answer:
             new_card = Flashcard(question, answer, 0, reversible)
             decks[deck_index].flashcards.append(new_card)
+            save_user_decks(user_id, decks)
     
     return redirect(f'/deck/{deck_index}')
 
@@ -275,7 +356,7 @@ def expand_deck(deck_index):
         return redirect('/login')
     
     user_id = user['userinfo']['sub']
-    decks = user_decks.get(user_id, [])
+    decks = get_user_decks(user_id)
     
     if deck_index < len(decks):
         deck = decks[deck_index]
@@ -293,6 +374,7 @@ def expand_deck(deck_index):
         
         # Add generated cards to the deck
         deck.flashcards.extend(new_cards)
+        save_user_decks(user_id, decks)
     
     return redirect(f'/deck/{deck_index}')
 
@@ -303,10 +385,11 @@ def delete_card(deck_index, card_index):
         return redirect('/login')
     
     user_id = user['userinfo']['sub']
-    decks = user_decks.get(user_id, [])
+    decks = get_user_decks(user_id)
     
     if deck_index < len(decks) and card_index < len(decks[deck_index].flashcards):
         decks[deck_index].flashcards.pop(card_index)
+        save_user_decks(user_id, decks)
     
     return redirect(f'/deck/{deck_index}')
 
@@ -317,10 +400,11 @@ def delete_deck(deck_index):
         return redirect('/login')
     
     user_id = user['userinfo']['sub']
-    decks = user_decks.get(user_id, [])
+    decks = get_user_decks(user_id)
     
     if deck_index < len(decks):
         decks.pop(deck_index)
+        save_user_decks(user_id, decks)
     
     return redirect('/manage-decks')
 
