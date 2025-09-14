@@ -22,6 +22,7 @@ except:
 def create_flashcard():
     try:
         flashcard = {
+            "id": request.form["id"],
             "question": request.form["question"],
             "answer": request.form["answer"],
             "correct_answers": 0
