@@ -10,7 +10,7 @@
             margin: 0;
             padding: 0;
             min-height: 100vh;
-            background: var(--gradient-top);
+            background: linear-gradient(180deg, var(--yinmn-blue) 0%, var(--marian-blue) 40%, var(--space-cadet) 85%, var(--black) 100%);
         }
 
         .top-bar {
@@ -97,15 +97,15 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 600px;
-            height: 400px;
+            width: 840px;
+            height: 560px;
             z-index: 1;
         }
 
         .card-content {
             position: relative;
             z-index: 2;
-            padding: 60px 40px;
+            padding: 120px 80px;
         }
 
         .deck-title {
@@ -309,8 +309,6 @@
     </div>
     
     <div class="content-container">
-        <a href="/study" class="back-btn">← Back to Study</a>
-        
         <div class="study-card">
             <img src="{{ url_for('static', filename='assets/flashcard.svg') }}" class="flashcard-svg" alt="Flashcard background">
             
@@ -339,6 +337,8 @@
                 </div>
             </div>
         </div>
+        
+        <a href="/study" class="back-btn" style="display: block; text-align: center; margin: 30px auto 0; width: 200px;">← Back to Study</a>
     </div>
 
     <script>
