@@ -663,6 +663,12 @@
         </div>
     </div>
 
+    <!-- Background Music -->
+    <audio id="battle-music" loop preload="auto">
+        <source src="{{ url_for('static', filename='assets/studystacks.mp3') }}" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
     <script>
         let currentCardIndex = 0;
         const studyData = {{ study_data | tojson }};
@@ -680,6 +686,10 @@
         let spellProgress = 0;
         let gameOver = false;
         let lastAnswerCorrect = false;
+        let battleMusicStarted = false;
+        
+        // Audio element
+        const battleMusic = document.getElementById('battle-music');
         
         // Initialize game
         document.addEventListener('DOMContentLoaded', function() {
@@ -702,10 +712,14 @@
             spellProgress = 0;
             gameOver = false;
             lastAnswerCorrect = false;
+            battleMusicStarted = false;
             
             // Update monster attack display
             document.getElementById('monster-attack').textContent = 
                 gameConfig.monster_attack_min + '-' + gameConfig.monster_attack_max;
+            
+            // Start battle music
+            startBattleMusic();
             
             // Update UI
             updateHealthBars();
@@ -1018,9 +1032,11 @@
         function checkGameOver() {
             if (playerHP <= 0) {
                 gameOver = true;
+                stopBattleMusic();
                 showGameOver(false);
             } else if (monsterHP <= 0 && monsterMaxHP > 0) {
                 gameOver = true;
+                stopBattleMusic();
                 showGameOver(true);
             }
         }
@@ -1048,7 +1064,34 @@
             document.getElementById('session-complete').classList.remove('hidden');
         }
         
+        function startBattleMusic() {
+            if (!battleMusicStarted && battleMusic) {
+                battleMusic.volume = 1; // Set volume to 100%
+                battleMusic.play().catch(error => {
+                    console.log('Audio autoplay prevented:', error);
+                    // Add click listener to start music on first user interaction
+                    document.addEventListener('click', function startMusicOnClick() {
+                        battleMusic.play();
+                        battleMusicStarted = true;
+                        document.removeEventListener('click', startMusicOnClick);
+                    }, { once: true });
+                });
+                battleMusicStarted = true;
+            }
+        }
+        
+        function stopBattleMusic() {
+            if (battleMusic && battleMusicStarted) {
+                battleMusic.pause();
+                battleMusic.currentTime = 0;
+                battleMusicStarted = false;
+            }
+        }
+        
         function finishSession() {
+            // Stop battle music when session ends
+            stopBattleMusic();
+            
             // Submit all results to server
             sessionResults.forEach(result => {
                 const form = document.createElement('form');
