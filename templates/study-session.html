@@ -58,7 +58,7 @@
         }
 
         .content-container {
-            margin-top: 80px;
+            margin-top: 40px;
             padding: 20px;
             max-width: 1200px;
             margin-left: auto;
@@ -69,7 +69,7 @@
             display: grid;
             grid-template-columns: 1fr 2fr 1fr;
             gap: 30px;
-            align-items: start;
+            align-items: center;
         }
 
         .monster-panel {
@@ -80,6 +80,7 @@
             backdrop-filter: blur(10px);
             z-index: 10;
             position: relative;
+            margin-left: -20px;
         }
 
         .player-panel {
@@ -90,6 +91,7 @@
             backdrop-filter: blur(10px);
             z-index: 10;
             position: relative;
+            margin-right: -20px;
         }
 
         .health-bar {
@@ -209,7 +211,7 @@
         .card-content {
             position: relative;
             z-index: 2;
-            padding: 120px 80px;
+            padding: 150px 50px;
         }
 
         .deck-title {
@@ -217,7 +219,7 @@
             font-size: 24px;
             font-weight: 600;
             color: var(--space-cadet);
-            margin-bottom: 30px;
+            margin-bottom: 0px;
             text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3);
         }
 
@@ -401,7 +403,7 @@
         }
 
         .hidden {
-            display: none;
+            display: none !important;
         }
 
         .next-card-btn {
@@ -657,8 +659,8 @@
         // Game state variables
         let playerHP = 0;
         let playerMaxHP = 0;
-        let monsterHP = 0;
-        let monsterMaxHP = 0;
+        let monsterHP = 1;
+        let monsterMaxHP = 1;
         let attackStreak = 0;
         let spellProgress = 0;
         let gameOver = false;
@@ -671,9 +673,9 @@
         });
         
         function initializeGame() {
-            // Calculate health values
+            // Calculate health values (doubled)
             const totalCards = studyData.length;
-            playerMaxHP = totalCards * 10;
+            playerMaxHP = totalCards * 20;  // Doubled from 10 to 20
             monsterMaxHP = Math.ceil((playerMaxHP * 2/3) / 10) * 10;
             
             // Set initial HP
@@ -693,8 +695,14 @@
         
         function loadCard(index) {
             if (index >= studyData.length) {
-                showSessionComplete();
-                return;
+                // Check if monster is still alive - if so, loop back to beginning
+                if (monsterHP > 0 && !gameOver) {
+                    currentCardIndex = 0;
+                    index = 0;
+                } else {
+                    showSessionComplete();
+                    return;
+                }
             }
             
             const cardData = studyData[index];
