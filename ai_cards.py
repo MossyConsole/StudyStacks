@@ -36,11 +36,11 @@ def getResponseFromPrompt(prompt: str, model: str = "command-r") -> str:
     return json.dumps(data, indent=2)
 
 
-if __name__ == "__main__":
-    prompt = """Generate 3 French vocabulary flashcards.
-Each line should be formatted as:
-Q: <word> | A: <translation>"""
+# if __name__ == "__main__":
+#     prompt = """Generate 3 French vocabulary flashcards.
+# Each line should be formatted as:
+# Q: <word> | A: <translation>"""
 
-    response = getResponseFromPrompt(prompt)
-    print("=== Raw Cohere output ===")
-    print(response)
+#     response = getResponseFromPrompt(prompt)
+#     print("=== Raw Cohere output ===")
+#     print(response)

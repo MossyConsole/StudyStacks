@@ -6,6 +6,7 @@ from authlib.integrations.flask_client import OAuth
 from dotenv import find_dotenv, load_dotenv
 from flask import Flask, redirect, render_template, session, url_for, request, jsonify
 from datacompression import Deck, Flashcard
+from ai_cards import getResponseFromPrompt
 
 ENV_FILE = find_dotenv()
 if ENV_FILE:
@@ -16,6 +17,82 @@ app.secret_key = env.get("APP_SECRET_KEY")
 
 # In-memory storage for decks (will be replaced with MongoDB)
 user_decks = {}
+
+def generate_ai_cards(deck, num_cards=5):
+    print("Got here first tho")
+    """Generate AI cards for a deck, avoiding duplicates with existing cards."""
+    existing_questions = [card.question.lower() for card in deck.flashcards]
+    existing_answers = [card.answer.lower() for card in deck.flashcards]
+    
+    # Create context about existing cards
+    existing_cards_text = ""
+    if deck.flashcards:
+        existing_cards_text = "\n\nExisting cards in this deck (DO NOT create duplicates):\n"
+        for card in deck.flashcards[:10]:  # Show up to 10 existing cards for context
+            existing_cards_text += f"Q: {card.question} | A: {card.answer}\n"
+    
+    prompt = f"""Generate {num_cards} flashcards for the deck "{deck.name}".
+Each line should be formatted EXACTLY as:
+Q: <question> | A: <answer>
+
+Requirements:
+- Make cards that fit the theme/subject of the deck name
+- Each card should be educational and useful for studying
+- Questions should be clear and concise
+- Answers should be accurate and brief
+- DO NOT create any duplicates of existing cards{existing_cards_text}
+
+Generate {num_cards} new unique flashcards now:"""
+
+    try:
+        response = getResponseFromPrompt(prompt)
+        print("Got it!")
+        return parse_ai_response(response, existing_questions, existing_answers)
+    except Exception as e:
+        print(f"Error generating AI cards: {e}")
+        return []
+
+def parse_ai_response(response, existing_questions, existing_answers):
+    """Parse AI response and return list of Flashcard objects."""
+    cards = []
+    lines = response.strip().split('\n')
+    
+    for line in lines:
+        line = line.strip()
+        if not line or not ('Q:' in line and 'A:' in line and '|' in line):
+            continue
+            
+        try:
+            # Split on | to get question and answer parts
+            parts = line.split('|', 1)
+            if len(parts) != 2:
+                continue
+                
+            question_part = parts[0].strip()
+            answer_part = parts[1].strip()
+            
+            # Remove Q: and A: prefixes
+            if question_part.startswith('Q:'):
+                question = question_part[2:].strip()
+            else:
+                continue
+                
+            if answer_part.startswith('A:'):
+                answer = answer_part[2:].strip()
+            else:
+                continue
+            
+            # Check for duplicates (case insensitive)
+            if question.lower() not in existing_questions and answer.lower() not in existing_answers:
+                cards.append(Flashcard(question, answer, 0, False))
+                existing_questions.append(question.lower())
+                existing_answers.append(answer.lower())
+                
+        except Exception as e:
+            print(f"Error parsing line '{line}': {e}")
+            continue
+    
+    return cards
 
 
 oauth = OAuth(app)
@@ -197,8 +274,25 @@ def expand_deck(deck_index):
     if not user:
         return redirect('/login')
     
-    # TODO: Implement AI card generation functionality
-    # This route is preserved for future implementation
+    user_id = user['userinfo']['sub']
+    decks = user_decks.get(user_id, [])
+    
+    if deck_index < len(decks):
+        deck = decks[deck_index]
+        
+        # Get number of cards to generate (default 5)
+        num_cards = request.form.get('num_cards', 5)
+        try:
+            num_cards = int(num_cards)
+            num_cards = max(1, min(num_cards, 10))  # Limit between 1-10 cards
+        except (ValueError, TypeError):
+            num_cards = 5
+        
+        # Generate AI cards
+        new_cards = generate_ai_cards(deck, num_cards)
+        
+        # Add generated cards to the deck
+        deck.flashcards.extend(new_cards)
     
     return redirect(f'/deck/{deck_index}')
 
