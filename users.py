@@ -22,7 +22,6 @@ except:
 def create_user():
     try:
         user = {
-            "username": request.form["username"],
             "email": request.form["email"]
                 }
         dbResponse = db.users.insert_one(user)
@@ -70,7 +69,7 @@ def get_some_users():
         )
 
 #==================================#
-
+"""
 @app.route("/users/<id>", methods=["PATCH"])
 def update_user(id):
     try:
@@ -98,7 +97,7 @@ def update_user(id):
             status = 500, # Internal server error
             mimetype = "application/json"
         )
-
+"""
 #==================================#
 
 @app.route("/users/<id>", methods=["DELETE"])
