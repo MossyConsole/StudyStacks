@@ -239,6 +239,10 @@
                     <span>🧠</span>
                     Start Studying
                 </button>
+                <button type="button" class="study-btn btn-primary" onclick="startExamPrep()" style="background: linear-gradient(135deg, #ef4444, #dc2626); box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);">
+                    <span>🔥</span>
+                    Exam Prep
+                </button>
                 <button type="button" class="study-btn btn-secondary" onclick="window.location.href='/manage-decks'">
                     <span>⚙️</span>
                     Manage Decks
@@ -254,6 +258,17 @@
     </div>
 
     <script>
+        function startExamPrep() {
+            const selectedDeck = document.querySelector('input[name="selected_deck_index"]:checked');
+            if (!selectedDeck) {
+                alert('Please select a deck first!');
+                return;
+            }
+            
+            const deckIndex = selectedDeck.value;
+            window.location.href = `/study/${deckIndex}?mode=exam_prep`;
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             const disabledItems = document.querySelectorAll('.select-item.disabled');
             const warningMessage = document.getElementById('warning-message');

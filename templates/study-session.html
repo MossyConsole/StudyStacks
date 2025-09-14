@@ -496,8 +496,8 @@
         }
 
         .damage-monster {
-            color: #22c55e;
-            text-shadow: 0 0 10px rgba(34, 197, 94, 0.8);
+            color: #ef4444;
+            text-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
         }
 
         .heal-indicator {
@@ -589,7 +589,7 @@
                 <img src="{{ url_for('static', filename='assets/flashcard.svg') }}" class="flashcard-svg" alt="Flashcard background">
                 
                 <div class="card-content">
-                    <div class="deck-title">{{ deck.name }}</div>
+                    <div class="deck-title">{{ deck.name }}{% if mode == 'exam_prep' %} (Exam Prep){% endif %}</div>
                     <div class="progress-info">Card <span id="current-card">1</span> of {{ deck.flashcards|length }}</div>
                     
                     <div class="card-question" id="question"></div>
@@ -667,6 +667,8 @@
         let currentCardIndex = 0;
         const studyData = {{ study_data | tojson }};
         const deckIndex = {{ deck_index }};
+        const gameConfig = {{ game_config | tojson }};
+        const studyMode = "{{ mode }}";
         let sessionResults = [];
         
         // Game state variables
@@ -686,10 +688,10 @@
         });
         
         function initializeGame() {
-            // Calculate health values (doubled)
+            // Calculate health values using game config
             const totalCards = studyData.length;
-            playerMaxHP = totalCards * 20;
-            monsterMaxHP = Math.ceil((playerMaxHP * 2/3) / 10) * 50;
+            playerMaxHP = totalCards * gameConfig.player_hp_multiplier;
+            monsterMaxHP = Math.ceil((playerMaxHP * gameConfig.monster_hp_ratio) / 10) * gameConfig.monster_hp_base;
             
             // Set initial HP
             playerHP = playerMaxHP;
@@ -700,6 +702,10 @@
             spellProgress = 0;
             gameOver = false;
             lastAnswerCorrect = false;
+            
+            // Update monster attack display
+            document.getElementById('monster-attack').textContent = 
+                gameConfig.monster_attack_min + '-' + gameConfig.monster_attack_max;
             
             // Update UI
             updateHealthBars();
@@ -775,7 +781,7 @@
             setTimeout(() => {
                 if (isCorrect && !gameOver) {
                     // Increment spell progress for correct answers
-                    if (spellProgress < 3) {
+                    if (spellProgress < gameConfig.spell_charge_requirement) {
                         spellProgress++;
                     }
                     updatePlayerStats();
@@ -814,7 +820,7 @@
             setTimeout(() => {
                 if (isCorrect && !gameOver) {
                     // Increment spell progress for correct answers
-                    if (spellProgress < 3) {
+                    if (spellProgress < gameConfig.spell_charge_requirement) {
                         spellProgress++;
                     }
                     updatePlayerStats();
@@ -835,7 +841,7 @@
             
             // Enable/disable spell button based on spell progress
             const spellBtn = document.getElementById('spell-btn');
-            spellBtn.disabled = spellProgress < 3;
+            spellBtn.disabled = spellProgress < gameConfig.spell_charge_requirement;
         }
         
         function chooseAction(action) {
@@ -855,11 +861,12 @@
                 showDamageIndicator('monster', 10);
                 attackStreak++;
                 
-                // Monster counterattacks for 5 damage
+                // Monster counterattacks
+                const monsterDamage = Math.floor(Math.random() * (gameConfig.monster_attack_max - gameConfig.monster_attack_min + 1)) + gameConfig.monster_attack_min;
                 setTimeout(() => {
                     if (monsterHP > 0) {
-                        playerHP = Math.max(0, playerHP - 5);
-                        showDamageIndicator('player', 5);
+                        playerHP = Math.max(0, playerHP - monsterDamage);
+                        showDamageIndicator('player', monsterDamage);
                     }
                     
                     updateHealthBars();
@@ -876,14 +883,17 @@
         }
         
         function handleSpell() {
-            if (spellProgress >= 3) {
-                // SuperStreak: 25 damage, no monster counter, heal 20 HP
-                monsterHP = Math.max(0, monsterHP - 25);
-                playerHP = Math.min(playerMaxHP, playerHP + 20);
+            if (spellProgress >= gameConfig.spell_charge_requirement) {
+                // SuperStreak: configurable damage and healing based on mode
+                const spellDamage = gameConfig.spell_damage;
+                const spellHealing = gameConfig.spell_healing;
                 
-                showDamageIndicator('monster', 25);
+                monsterHP = Math.max(0, monsterHP - spellDamage);
+                playerHP = Math.min(playerMaxHP, playerHP + spellHealing);
+                
+                showDamageIndicator('monster', spellDamage);
                 setTimeout(() => {
-                    showHealIndicator('player', 20);
+                    showHealIndicator('player', spellHealing);
                 }, 500);
                 
                 // Reset spell progress
@@ -903,12 +913,13 @@
         }
         
         function handleIncorrectAnswer() {
-            // Player deals 0 damage, monster deals 10 damage, reset attack streak
-            playerHP = Math.max(0, playerHP - 10);
+            // Player deals 0 damage, monster deals damage, reset attack streak
+            const monsterDamage = (Math.floor(Math.random() * (gameConfig.monster_attack_max - gameConfig.monster_attack_min + 1)) + gameConfig.monster_attack_min) * 2;
+            playerHP = Math.max(0, playerHP - monsterDamage);
             attackStreak = 0;
             spellProgress = 0;
             
-            showDamageIndicator('player', 10);
+            showDamageIndicator('player', monsterDamage);
             
             updateHealthBars();
             updatePlayerStats();
@@ -936,21 +947,19 @@
         }
         
         function updatePlayerStats() {
-            // Update attack streak
             document.getElementById('attack-streak').textContent = attackStreak;
-            
-            // Update spell progress text
-            document.getElementById('spell-progress').textContent = spellProgress + '/3';
+            document.getElementById('spell-progress').textContent = spellProgress + '/' + gameConfig.spell_charge_requirement;
             
             // Update spell streak bar
-            const spellPercent = (spellProgress / 3) * 100;
-            document.getElementById('spell-streak-bar').style.width = spellPercent + '%';
+            const spellBar = document.getElementById('spell-streak-bar');
+            const spellPercentage = (spellProgress / gameConfig.spell_charge_requirement) * 100;
+            spellBar.style.width = spellPercentage + '%';
             
             // Update spell status
             const spellStatus = document.getElementById('spell-status');
-            if (spellProgress >= 3) {
+            if (spellProgress >= gameConfig.spell_charge_requirement) {
                 spellStatus.textContent = 'Ready!';
-                spellStatus.style.color = '#10b981';
+                spellStatus.style.color = '#22c55e';
             } else {
                 spellStatus.textContent = 'Locked';
                 spellStatus.style.color = 'rgba(255, 255, 255, 0.6)';
@@ -964,13 +973,21 @@
             
             if (target === 'player') {
                 indicator.classList.add('damage-player');
-                indicator.style.left = '75%';
+                const playerPanel = document.querySelector('.player-panel');
+                const rect = playerPanel.getBoundingClientRect();
+                indicator.style.left = (rect.left + rect.width / 2) + 'px';
+                indicator.style.top = (rect.top - 30) + 'px';
             } else {
                 indicator.classList.add('damage-monster');
-                indicator.style.left = '25%';
+                const monsterPanel = document.querySelector('.monster-panel');
+                const rect = monsterPanel.getBoundingClientRect();
+                indicator.style.left = (rect.left + rect.width / 2) + 'px';
+                indicator.style.top = (rect.top - 30) + 'px';
             }
             
-            indicator.style.top = '50%';
+            indicator.style.position = 'fixed';
+            indicator.style.transform = 'translateX(-50%)';
+            indicator.style.zIndex = '1000';
             document.body.appendChild(indicator);
             
             setTimeout(() => {
@@ -982,8 +999,14 @@
             const indicator = document.createElement('div');
             indicator.className = 'damage-indicator heal-indicator';
             indicator.textContent = '+' + heal;
-            indicator.style.left = '75%';
-            indicator.style.top = '50%';
+            
+            const playerPanel = document.querySelector('.player-panel');
+            const rect = playerPanel.getBoundingClientRect();
+            indicator.style.left = (rect.left + rect.width / 2) + 'px';
+            indicator.style.top = (rect.top - 30) + 'px';
+            indicator.style.position = 'fixed';
+            indicator.style.transform = 'translateX(-50%)';
+            indicator.style.zIndex = '1000';
             
             document.body.appendChild(indicator);
             

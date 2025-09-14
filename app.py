@@ -461,6 +461,9 @@ def study_deck(deck_index):
     auth_id = user['userinfo']['sub']
     decks = get_user_decks(auth_id)
     
+    # Get mode parameter (normal or exam_prep)
+    mode = request.args.get('mode', 'normal')
+    
     if deck_index < len(decks):
         deck = decks[deck_index]
         if not deck.flashcards or len(deck.flashcards) < 2:
@@ -468,7 +471,40 @@ def study_deck(deck_index):
         
         # Generate study session data with answer choices
         study_data = generate_study_session(deck)
-        return render_template('study-session.html', user=user, deck=deck, deck_index=deck_index, study_data=study_data)
+        
+        # Configuration for different modes
+        game_config = {
+            'normal': {
+                'player_hp_multiplier': 20,
+                'monster_hp_ratio': 2/3,
+                'monster_hp_base': 10,
+                'monster_attack_min': 5,
+                'monster_attack_max': 10,
+                'spell_charge_requirement': 3,
+                'spell_damage': 20,
+                'spell_healing': 20
+            },
+            'exam_prep': {
+                'player_hp_multiplier': 20,  # Same as normal for now
+                'monster_hp_ratio': 2/3,     # Same as normal for now
+                'monster_hp_base': 40,       # Same as normal for now
+                'monster_attack_min': 10,     # Different monster attack
+                'monster_attack_max': 15,    # Different monster attack
+                'spell_charge_requirement': 3, # Requires 5 correct answers
+                'spell_damage': 50,          # Higher spell damage for exam prep
+                'spell_healing': 50          # Higher spell healing for exam prep
+            }
+        }
+        
+        config = game_config.get(mode, game_config['normal'])
+        
+        return render_template('study-session.html', 
+                             user=user, 
+                             deck=deck, 
+                             deck_index=deck_index, 
+                             study_data=study_data,
+                             mode=mode,
+                             game_config=config)
     
     return redirect('/study')
 
