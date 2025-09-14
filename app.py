@@ -222,8 +222,12 @@ Requirements:
 - Make cards that fit the theme/subject of the deck name
 - Each card should be educational and useful for studying
 - Questions should be clear and concise
+- Questions and answers must be in the same style as the existing cards.
 - Answers should be accurate and brief
-- DO NOT create any duplicates of existing cards{existing_cards_text}
+- DO NOT create any duplicates of existing cards.
+- DO NOT add any filler text to your response. Respond only with the formatted text.
+
+Here are the existing cards: {existing_cards_text}
 
 Generate {num_cards} new unique flashcards now:"""
 
