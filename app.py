@@ -438,6 +438,14 @@ def study_select():
         deck_index = int(idx)
     except (TypeError, ValueError):
         return redirect('/study')
+    
+    # Validate deck has enough cards
+    auth_id = user['userinfo']['sub']
+    decks = get_user_decks(auth_id)
+    
+    if deck_index >= len(decks) or len(decks[deck_index].flashcards) < 2:
+        return redirect('/study')
+    
     return redirect(f'/study/{deck_index}')
 
 @app.route('/study/<int:deck_index>')
@@ -451,7 +459,7 @@ def study_deck(deck_index):
     
     if deck_index < len(decks):
         deck = decks[deck_index]
-        if not deck.flashcards:
+        if not deck.flashcards or len(deck.flashcards) < 2:
             return redirect('/study')
         
         # Generate study session data with answer choices
@@ -605,7 +613,10 @@ def delete_deck(deck_index):
 
 @app.route('/explore-decks')
 def explore_decks():
-    return render_template('explore-decks.html')
+    user = session.get('user')
+    if not user:
+        return redirect('/login')
+    return render_template('explore-decks.html', user=user)
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=3000, debug=True)
