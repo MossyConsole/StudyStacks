@@ -1,5 +1,6 @@
-Flask==2.3.3
-python-dotenv==1.0.0
-Authlib==1.2.1
-requests==2.31.0
 transformers>=4.35.0
+flask>=2.0.3
+python-dotenv>=0.19.2
+authlib>=1.0
+requests>=2.27.1
+pymongo
