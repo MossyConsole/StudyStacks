@@ -60,7 +60,7 @@
         .content-container {
             margin-top: 80px;
             padding: 40px;
-            max-width: 600px;
+            max-width: 800px;
             margin-left: auto;
             margin-right: auto;
         }
@@ -83,13 +83,29 @@
         }
 
         .study-card {
-            background: var(--transparent-white-15);
-            backdrop-filter: blur(10px);
-            border-radius: 16px;
-            padding: 40px;
-            border: 1px solid var(--transparent-white-20);
+            position: relative;
             text-align: center;
             margin-bottom: 30px;
+            min-height: 600px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .flashcard-svg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 400px;
+            z-index: 1;
+        }
+
+        .card-content {
+            position: relative;
+            z-index: 2;
+            padding: 60px 40px;
         }
 
         .deck-title {
@@ -102,14 +118,15 @@
 
         .card-question {
             font-family: var(--font-rubik);
-            font-size: 20px;
-            font-weight: 500;
+            font-size: 24px;
+            font-weight: 600;
             color: var(--white);
-            margin-bottom: 20px;
-            min-height: 60px;
+            margin-bottom: 30px;
+            min-height: 80px;
             display: flex;
             align-items: center;
             justify-content: center;
+            text-shadow: 0 2px 4px var(--transparent-black-30);
         }
 
         .card-answer {
@@ -151,6 +168,90 @@
             gap: 15px;
             justify-content: center;
             margin-top: 20px;
+        }
+
+        .choice-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 30px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .choice-btn {
+            background: var(--transparent-white-15);
+            color: var(--white);
+            border: 2px solid var(--transparent-white-20);
+            border-radius: 12px;
+            padding: 15px 20px;
+            font-family: var(--font-poppins);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .choice-btn:hover {
+            background: var(--transparent-white-25);
+            border-color: var(--tiffany-blue);
+            transform: translateY(-2px);
+        }
+
+        .choice-btn.correct {
+            background: #4ade80;
+            border-color: #22c55e;
+            color: white;
+        }
+
+        .choice-btn.incorrect {
+            background: #f87171;
+            border-color: #ef4444;
+            color: white;
+        }
+
+        .typed-answer-input {
+            width: 100%;
+            max-width: 400px;
+            padding: 15px 20px;
+            border: 2px solid var(--transparent-white-20);
+            border-radius: 12px;
+            background: var(--transparent-white-15);
+            color: var(--white);
+            font-family: var(--font-poppins);
+            font-size: 16px;
+            text-align: center;
+            margin: 20px auto;
+            display: block;
+        }
+
+        .typed-answer-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .submit-answer-btn {
+            background: var(--tiffany-blue);
+            color: var(--space-cadet);
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-family: var(--font-poppins);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .submit-answer-btn:hover {
+            background: var(--aquamarine);
+            transform: translateY(-2px);
         }
 
         .correct-btn {
@@ -211,78 +312,180 @@
         <a href="/study" class="back-btn">← Back to Study</a>
         
         <div class="study-card">
-            <div class="deck-title">{{ deck.name }}</div>
-            <div class="progress-info">Card <span id="current-card">1</span> of {{ deck.flashcards|length }}</div>
+            <img src="{{ url_for('static', filename='assets/flashcard.svg') }}" class="flashcard-svg" alt="Flashcard background">
             
-            <div class="card-question" id="question">
-                {{ deck.flashcards[0].question }}
-            </div>
-            
-            <div class="card-answer hidden" id="answer">
-                {{ deck.flashcards[0].answer }}
-            </div>
-            
-            <button class="show-answer-btn" id="show-answer" onclick="showAnswer()">Show Answer</button>
-            
-            <div class="answer-buttons hidden" id="answer-buttons">
-                <button class="incorrect-btn" onclick="submitAnswer(false)">Incorrect</button>
-                <button class="correct-btn" onclick="submitAnswer(true)">Correct</button>
+            <div class="card-content">
+                <div class="deck-title">{{ deck.name }}</div>
+                <div class="progress-info">Card <span id="current-card">1</span> of {{ deck.flashcards|length }}</div>
+                
+                <div class="card-question" id="question"></div>
+                
+                <!-- Multiple Choice / True-False Buttons -->
+                <div class="choice-buttons hidden" id="choice-buttons"></div>
+                
+                <!-- Typed Answer Input -->
+                <div class="hidden" id="typed-answer-container">
+                    <input type="text" class="typed-answer-input" id="typed-answer" placeholder="Type your answer here...">
+                    <button class="submit-answer-btn" onclick="submitTypedAnswer()">Submit Answer</button>
+                </div>
+                
+                <!-- Next Card Button -->
+                <button class="show-answer-btn hidden" id="next-card-btn" onclick="nextCard()">Next Card</button>
+                
+                <!-- Session Complete -->
+                <div class="hidden" id="session-complete">
+                    <h3 style="color: var(--white); margin-bottom: 20px;">Study Session Complete! &#127881;</h3>
+                    <button class="show-answer-btn" onclick="finishSession()">Finish Session</button>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
         let currentCardIndex = 0;
-        const cards = {{ deck.flashcards | tojson }};
+        const studyData = {{ study_data | tojson }};
         const deckIndex = {{ deck_index }};
+        let sessionResults = [];
         
-        function showAnswer() {
-            document.getElementById('answer').classList.remove('hidden');
-            document.getElementById('show-answer').classList.add('hidden');
-            document.getElementById('answer-buttons').classList.remove('hidden');
-        }
+        // Initialize first card
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCard(0);
+        });
         
-        function submitAnswer(correct) {
-            // Send answer to server
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = `/study/${deckIndex}/answer`;
+        function loadCard(index) {
+            if (index >= studyData.length) {
+                showSessionComplete();
+                return;
+            }
             
-            const cardIndexInput = document.createElement('input');
-            cardIndexInput.type = 'hidden';
-            cardIndexInput.name = 'card_index';
-            cardIndexInput.value = currentCardIndex;
+            const cardData = studyData[index];
+            document.getElementById('current-card').textContent = index + 1;
+            document.getElementById('question').textContent = cardData.question;
             
-            const correctInput = document.createElement('input');
-            correctInput.type = 'hidden';
-            correctInput.name = 'correct';
-            correctInput.value = correct;
+            // Hide all answer containers
+            document.getElementById('choice-buttons').classList.add('hidden');
+            document.getElementById('typed-answer-container').classList.add('hidden');
+            document.getElementById('next-card-btn').classList.add('hidden');
             
-            form.appendChild(cardIndexInput);
-            form.appendChild(correctInput);
-            document.body.appendChild(form);
-            
-            // Move to next card or finish
-            currentCardIndex++;
-            if (currentCardIndex < cards.length) {
-                nextCard();
+            // Show appropriate answer interface
+            if (cardData.answer_mode === 'typed') {
+                document.getElementById('typed-answer-container').classList.remove('hidden');
+                document.getElementById('typed-answer').value = '';
+                document.getElementById('typed-answer').focus();
             } else {
-                // Study session complete
-                form.submit();
+                // Multiple choice or true/false
+                const choiceContainer = document.getElementById('choice-buttons');
+                choiceContainer.innerHTML = '';
+                choiceContainer.classList.remove('hidden');
+                
+                cardData.choices.forEach((choice, i) => {
+                    const button = document.createElement('button');
+                    button.className = 'choice-btn';
+                    button.textContent = choice;
+                    button.onclick = () => selectChoice(choice, cardData.correct_answer);
+                    choiceContainer.appendChild(button);
+                });
             }
         }
         
-        function nextCard() {
-            const card = cards[currentCardIndex];
-            document.getElementById('current-card').textContent = currentCardIndex + 1;
-            document.getElementById('question').textContent = card.question;
-            document.getElementById('answer').textContent = card.answer;
+        function selectChoice(selectedAnswer, correctAnswer) {
+            const isCorrect = selectedAnswer === correctAnswer;
+            const buttons = document.querySelectorAll('.choice-btn');
             
-            // Reset UI
-            document.getElementById('answer').classList.add('hidden');
-            document.getElementById('show-answer').classList.remove('hidden');
-            document.getElementById('answer-buttons').classList.add('hidden');
+            // Disable all buttons and show results
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                if (btn.textContent === correctAnswer) {
+                    btn.classList.add('correct');
+                } else if (btn.textContent === selectedAnswer && !isCorrect) {
+                    btn.classList.add('incorrect');
+                }
+            });
+            
+            // Record result
+            sessionResults.push({
+                cardIndex: currentCardIndex,
+                correct: isCorrect
+            });
+            
+            // Show next card button after delay
+            setTimeout(() => {
+                document.getElementById('next-card-btn').classList.remove('hidden');
+            }, 1000);
         }
+        
+        function submitTypedAnswer() {
+            const userAnswer = document.getElementById('typed-answer').value.trim();
+            const correctAnswer = studyData[currentCardIndex].correct_answer;
+            
+            // Simple case-insensitive comparison
+            const isCorrect = userAnswer.toLowerCase() === correctAnswer.toLowerCase();
+            
+            // Show feedback
+            const input = document.getElementById('typed-answer');
+            input.style.borderColor = isCorrect ? '#22c55e' : '#ef4444';
+            input.style.backgroundColor = isCorrect ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)';
+            
+            if (!isCorrect) {
+                input.value = `Your answer: ${userAnswer} | Correct: ${correctAnswer}`;
+            }
+            
+            // Record result
+            sessionResults.push({
+                cardIndex: currentCardIndex,
+                correct: isCorrect
+            });
+            
+            // Show next card button after delay
+            setTimeout(() => {
+                document.getElementById('next-card-btn').classList.remove('hidden');
+            }, 1500);
+        }
+        
+        function nextCard() {
+            currentCardIndex++;
+            loadCard(currentCardIndex);
+        }
+        
+        function showSessionComplete() {
+            document.getElementById('choice-buttons').classList.add('hidden');
+            document.getElementById('typed-answer-container').classList.add('hidden');
+            document.getElementById('next-card-btn').classList.add('hidden');
+            document.getElementById('session-complete').classList.remove('hidden');
+        }
+        
+        function finishSession() {
+            // Submit all results to server
+            sessionResults.forEach(result => {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/study/${deckIndex}/answer`;
+                
+                const cardIndexInput = document.createElement('input');
+                cardIndexInput.type = 'hidden';
+                cardIndexInput.name = 'card_index';
+                cardIndexInput.value = result.cardIndex;
+                
+                const correctInput = document.createElement('input');
+                correctInput.type = 'hidden';
+                correctInput.name = 'correct';
+                correctInput.value = result.correct;
+                
+                form.appendChild(cardIndexInput);
+                form.appendChild(correctInput);
+                document.body.appendChild(form);
+            });
+            
+            // Redirect back to study page
+            window.location.href = '/study';
+        }
+        
+        // Allow Enter key for typed answers
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !document.getElementById('typed-answer-container').classList.contains('hidden')) {
+                submitTypedAnswer();
+            }
+        });
     </script>
 </body>
 </html>

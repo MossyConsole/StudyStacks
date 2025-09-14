@@ -1,4 +1,5 @@
 import json
+import random
 from os import environ as env
 from urllib.parse import quote_plus, urlencode
 
@@ -94,6 +95,53 @@ def parse_ai_response(response, existing_questions, existing_answers):
     
     return cards
 
+def generate_study_session(deck):
+    """Generate study session data with answer choices for each card."""
+    study_data = []
+    all_answers = [card.answer for card in deck.flashcards]
+    
+    for i, card in enumerate(deck.flashcards):
+        card_data = {
+            'question': card.question,
+            'correct_answer': card.answer,
+            'correct_count': card.correct_answers,
+            'reversible': card.reversible
+        }
+        
+        # Determine answer mode based on correct answers and deck size
+        if card.correct_answers > 5:
+            # Guaranteed typed answer if >5 correct answers
+            card_data['answer_mode'] = 'typed'
+            card_data['choices'] = []
+        elif len(deck.flashcards) < 4:
+            # True/False mode for small decks
+            card_data['answer_mode'] = 'true_false'
+            # Generate a false answer by picking a random different answer
+            false_answers = [ans for ans in all_answers if ans != card.answer]
+            false_answer = random.choice(false_answers) if false_answers else "False answer"
+            
+            choices = [card.answer, false_answer]
+            random.shuffle(choices)
+            card_data['choices'] = choices
+        else:
+            # Multiple choice mode
+            card_data['answer_mode'] = 'multiple_choice'
+            # Get 3 wrong answers from other cards
+            wrong_answers = [ans for ans in all_answers if ans != card.answer]
+            selected_wrong = random.sample(wrong_answers, min(3, len(wrong_answers)))
+            
+            # If we don't have enough wrong answers, generate some generic ones
+            while len(selected_wrong) < 3:
+                selected_wrong.append(f"Option {len(selected_wrong) + 1}")
+            
+            choices = [card.answer] + selected_wrong[:3]
+            random.shuffle(choices)
+            card_data['choices'] = choices
+        
+        study_data.append(card_data)
+    
+    return study_data
+
 
 oauth = OAuth(app)
 
@@ -183,7 +231,10 @@ def study_deck(deck_index):
         deck = decks[deck_index]
         if not deck.flashcards:
             return redirect('/study')
-        return render_template('study-session.html', user=user, deck=deck, deck_index=deck_index)
+        
+        # Generate study session data with answer choices
+        study_data = generate_study_session(deck)
+        return render_template('study-session.html', user=user, deck=deck, deck_index=deck_index, study_data=study_data)
     
     return redirect('/study')
 
