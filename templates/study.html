@@ -245,14 +245,14 @@
                 </button>
                 <button type="button" class="study-btn btn-secondary" onclick="window.location.href='/manage-decks'">
                     <span>⚙️</span>
-                    Manage Decks
+                    Manage Stacks
                 </button>
             </div>
         </form>
         {% else %}
         <div style="text-align: center; color: rgba(255, 255, 255, 0.7); font-family: var(--font-poppins);">
-            <p>No decks available. Create a deck first from the Manage Decks page.</p>
-            <button onclick="window.location.href='/manage-decks'" class="study-btn" style="margin-top: 15px;">Go to Manage Decks</button>
+            <p>No stacks available. Create a stack first from the Manage Stacks page.</p>
+            <button onclick="window.location.href='/manage-decks'" class="study-btn" style="margin-top: 15px;">Go to Manage Stacks</button>
         </div>
         {% endif %}
     </div>
@@ -261,7 +261,7 @@
         function startExamPrep() {
             const selectedDeck = document.querySelector('input[name="selected_deck_index"]:checked');
             if (!selectedDeck) {
-                alert('Please select a deck first!');
+                alert('Please select a stack first!');
                 return;
             }
             

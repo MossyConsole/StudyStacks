@@ -553,6 +553,9 @@ def create_deck():
         new_deck = Deck(deck_name, [])
         decks.append(new_deck)
         save_user_decks(auth_id, decks)
+        # Auto-redirect to the newly created deck's manager
+        new_deck_index = len(decks) - 1
+        return redirect(f'/deck/{new_deck_index}')
     
     return redirect('/manage-decks')
 

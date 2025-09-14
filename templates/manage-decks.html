@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StudyStacks - Manage Decks</title>
+    <title>StudyStacks - Manage Stacks</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <style>
         body {
@@ -204,13 +204,13 @@
     </div>
     
     <div class="content-container">
-        <h1 class="page-title">Manage Decks</h1>
+        <h1 class="page-title">Manage Stacks</h1>
         
         <div class="create-deck-form">
-            <h2 style="font-family: var(--font-rubik); font-size: 20px; color: var(--white); margin-bottom: 15px;">Create New Deck</h2>
+            <h2 style="font-family: var(--font-rubik); font-size: 20px; color: var(--white); margin-bottom: 15px;">Create New Stack</h2>
             <form action="/create-deck" method="POST">
-                <input type="text" name="deck_name" class="form-input" placeholder="Enter deck name" required>
-                <button type="submit" class="btn">Create Deck</button>
+                <input type="text" name="deck_name" class="form-input" placeholder="Enter stack name" required>
+                <button type="submit" class="btn">Create Stack</button>
             </form>
         </div>
 
@@ -219,7 +219,7 @@
             <div class="deck-card" onclick="window.location.href='/deck/{{ loop.index0 }}'">
                 <div class="deck-header">
                     <div class="deck-name">{{ deck.name }}</div>
-                    <button class="delete-deck-btn" onclick="event.stopPropagation(); deleteDeck({{ loop.index0 }})">×</button>
+                    <button class="delete-deck-btn" onclick="event.stopPropagation(); deleteStack({{ loop.index0 }})">×</button>
                 </div>
                 <div class="deck-info">{{ deck.flashcards|length }} cards</div>
             </div>
@@ -227,15 +227,15 @@
             
             {% if not decks %}
             <div style="text-align: center; color: rgba(255, 255, 255, 0.7); font-family: var(--font-poppins); grid-column: 1 / -1;">
-                <p>No decks yet. Create your first deck above!</p>
+                <p>No stacks yet. Create your first stack above!</p>
             </div>
             {% endif %}
         </div>
     </div>
 
     <script>
-        function deleteDeck(deckIndex) {
-            if (confirm('Are you sure you want to delete this deck? This action cannot be undone.')) {
+        function deleteStack(deckIndex) {
+            if (confirm('Are you sure you want to delete this stack? This action cannot be undone.')) {
                 const form = document.createElement('form');
                 form.method = 'POST';
                 form.action = `/delete-deck/${deckIndex}`;
