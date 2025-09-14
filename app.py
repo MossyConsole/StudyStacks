@@ -17,6 +17,7 @@ app.secret_key = env.get("APP_SECRET_KEY")
 # In-memory storage for decks (will be replaced with MongoDB)
 user_decks = {}
 
+
 oauth = OAuth(app)
 
 oauth.register(
@@ -122,7 +123,6 @@ def submit_answer(deck_index):
         card_index = int(request.form.get('card_index', 0))
         correct = request.form.get('correct') == 'true'
         
-        # Update card's correct answers if answered correctly
         if correct and card_index < len(decks[deck_index].flashcards):
             decks[deck_index].flashcards[card_index].correct_answers += 1
             decks[deck_index].experience += 1
@@ -190,6 +190,45 @@ def add_card(deck_index):
             decks[deck_index].flashcards.append(new_card)
     
     return redirect(f'/deck/{deck_index}')
+
+@app.route('/deck/<int:deck_index>/expand', methods=['POST'])
+def expand_deck(deck_index):
+    user = session.get('user')
+    if not user:
+        return redirect('/login')
+    
+    # TODO: Implement AI card generation functionality
+    # This route is preserved for future implementation
+    
+    return redirect(f'/deck/{deck_index}')
+
+@app.route('/deck/<int:deck_index>/delete-card/<int:card_index>', methods=['POST'])
+def delete_card(deck_index, card_index):
+    user = session.get('user')
+    if not user:
+        return redirect('/login')
+    
+    user_id = user['userinfo']['sub']
+    decks = user_decks.get(user_id, [])
+    
+    if deck_index < len(decks) and card_index < len(decks[deck_index].flashcards):
+        decks[deck_index].flashcards.pop(card_index)
+    
+    return redirect(f'/deck/{deck_index}')
+
+@app.route('/delete-deck/<int:deck_index>', methods=['POST'])
+def delete_deck(deck_index):
+    user = session.get('user')
+    if not user:
+        return redirect('/login')
+    
+    user_id = user['userinfo']['sub']
+    decks = user_decks.get(user_id, [])
+    
+    if deck_index < len(decks):
+        decks.pop(deck_index)
+    
+    return redirect('/manage-decks')
 
 @app.route('/explore-decks')
 def explore_decks():

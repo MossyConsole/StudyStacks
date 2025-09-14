@@ -99,6 +99,35 @@
             font-weight: 600;
             color: var(--white);
             margin-bottom: 10px;
+            flex: 1;
+        }
+
+        .delete-deck-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            opacity: 0.8;
+        }
+
+        .delete-deck-btn:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .deck-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
         }
 
         .deck-info {
@@ -187,7 +216,10 @@
         <div class="deck-grid">
             {% for deck in decks %}
             <div class="deck-card" onclick="window.location.href='/deck/{{ loop.index0 }}'">
-                <div class="deck-name">{{ deck.name }}</div>
+                <div class="deck-header">
+                    <div class="deck-name">{{ deck.name }}</div>
+                    <button class="delete-deck-btn" onclick="event.stopPropagation(); deleteDeck({{ loop.index0 }})">×</button>
+                </div>
                 <div class="deck-info">{{ deck.flashcards|length }} cards</div>
             </div>
             {% endfor %}
@@ -199,5 +231,17 @@
             {% endif %}
         </div>
     </div>
+
+    <script>
+        function deleteDeck(deckIndex) {
+            if (confirm('Are you sure you want to delete this deck? This action cannot be undone.')) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/delete-deck/${deckIndex}`;
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+    </script>
 </body>
 </html>

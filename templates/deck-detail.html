@@ -198,6 +198,34 @@
             font-size: 12px;
             color: rgba(255, 255, 255, 0.6);
         }
+
+        .delete-card-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            opacity: 0.7;
+        }
+
+        .delete-card-btn:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .card-item {
+            position: relative;
+        }
     </style>
 </head>
 <body>
@@ -229,9 +257,25 @@
             </form>
         </div>
 
+        <div class="add-card-form" style="margin-bottom: 30px;">
+            <h2 style="font-family: var(--font-rubik); font-size: 20px; color: var(--white); margin-bottom: 15px;">🤖 AI Deck Expansion</h2>
+            <p style="font-family: var(--font-poppins); font-size: 14px; color: rgba(255, 255, 255, 0.8); margin-bottom: 15px;">
+                Generate more cards automatically based on your existing cards using AI
+            </p>
+            <form action="/deck/{{ deck_index }}/expand" method="POST" style="display: flex; gap: 10px; align-items: end;">
+                <div style="flex: 1;">
+                    <input type="number" name="num_cards" class="form-input" placeholder="Number of cards" min="1" max="10" value="3" required style="margin-bottom: 0;">
+                </div>
+                <button type="submit" class="btn" style="background: linear-gradient(135deg, #9333ea, #c084fc); margin-bottom: 0;">
+                    ✨ Expand Deck
+                </button>
+            </form>
+        </div>
+
         <div class="cards-grid">
             {% for card in deck.flashcards %}
             <div class="card-item">
+                <button class="delete-card-btn" onclick="deleteCard({{ deck_index }}, {{ loop.index0 }})">×</button>
                 <div class="card-question">Q: {{ card.question }}</div>
                 <div class="card-answer">A: {{ card.answer }}</div>
                 <div class="card-meta">
@@ -247,5 +291,17 @@
             {% endif %}
         </div>
     </div>
+
+    <script>
+        function deleteCard(deckIndex, cardIndex) {
+            if (confirm('Delete this card?')) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/deck/${deckIndex}/delete-card/${cardIndex}`;
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+    </script>
 </body>
 </html>
